@@ -52,6 +52,53 @@ void matmul_blas(const float* A, const float* B, float* C, int M, int N, int K)
 void matmul_v1(const float *A, const float *B, float *C, int M, int N, int K)
 {
 	// Add your hown naive 3-loop implementation here
+	int i;
+	int j;
+	int k;
+
+	for(i=0; i<M; i ++)
+		for(j=0; j<N; j ++)
+			for(k=0; k<K; k ++)
+				C[j*M+i] += A[k*M+i] * B[j*K+k];
+
+}
+
+void matmul_v2(const float *A, const float *B, float *C, int M, int N, int K)
+{
+	// Add your hown naive 3-loop implementation here
+	int i;
+	int j;
+	int k;
+
+	for(i=0; i<M; i ++)
+		for(j=0; j<N; j ++){
+			float x=0.0f;	
+			for(k=0; k<K; k ++)
+				x += A[k*M+i] * B[j*K+k];
+			C[j*M+i] = x;		
+		}
+}
+
+void matmul_v3(const float *A, const float *B, float *C, int M, int N, int K)
+{
+	// Add your hown naive 3-loop implementation here
+	int i;
+	int j;
+	int k;
+	
+	float *A_T = malloc(K * M * sizeof(float));
+	for(j=0; j<M; j ++)
+		for(i=0; i<K; i ++){
+			A_T[K*j+i] = A[M*i+j];
+		}
+
+	for(j=0; j<N; j ++)
+		for(i=0; i<M; i ++){
+			float x=0.0f;	
+			for(k=0; k<K; k ++)
+				x += A_T[i*K+k] * B[j*K+k];
+			C[j*M+i] = x;		
+		}
 }
 
 
@@ -79,7 +126,7 @@ int main(int argc, char *argv[])
 
 	init_timing(&timer);
 
-	matmul_v1(A,B,C,M,N,K); //your custom matmul implementation
+	matmul_v3(A,B,C,M,N,K); //your custom matmul implementation
 	
 	printf("Custom sgemm time: %f s\n", elapsed_time(timer));
 	
