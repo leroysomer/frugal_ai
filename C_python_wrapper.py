@@ -54,4 +54,4 @@ def curves(start, stop, step):
     plt.show()
     return
 
-curves(128, 4096, 128)
+curves(128, 1920, 128)

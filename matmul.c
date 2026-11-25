@@ -102,6 +102,69 @@ void matmul_v3(const float *A, const float *B, float *C, int M, int N, int K)
 }
 
 
+// Define a memory aligned vector type of 32 Bytes -> 8 float of 4 bytes (32 bits) each
+typedef float vec __attribute__ (( vector_size(32) ));
+
+void matmul_v4(const float *A, const float *B, float *C, int M, int N, int K)
+{
+	if(K % 8 != 0)
+	{
+		printf("Error, mismatch between matrix size and kernel size");
+		exit(EXIT_FAILURE);
+	}
+	
+	// Some vector creation and usage exemples
+	// Dynamically allocate a space in memory composed of X elements using the size of one element as alignement
+	// vec *a = (vec*) aligned_alloc(sizeof(vec),X*sizeof(vec));  
+	
+	// Allocate and initialize a vector to a constant value
+	// vec acc = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+	
+	// Fill a vector through indexing in a loop
+	// for (i = 0; i < 8; i++)
+	//     v[i] = i;
+	
+	// Access element i of a vectorized version of the matrix A
+	// a[i/8][i%8] = A[i];
+	
+	
+	
+	//1° Create the vectorized versions of A and B
+
+	vec *a = (vec*) aligned_alloc(sizeof(vec),(size_t)K*M*sizeof(float));
+	vec *b = (vec*) aligned_alloc(sizeof(vec),(size_t)K*N*sizeof(float));
+
+	//2° Fill the vectorized versions
+	for(int i=0; i<M;i++)
+		for (int k=0; k<K;k++){
+			int idx = i*K+k;
+			a[idx/8][idx%8]=A[k*M+i];
+		}
+
+	for(int j=0; j<N;j++)
+		for (int k=0; k<K;k++){
+			int idx = K*j+k;
+			b[idx/8][idx%8]=B[idx];
+		}
+	
+	int steps = K/8;
+	
+	//3° Do the i,j,k loops with the vectorized accumulate loop over k and fill the corresponding cell of C
+	for(int j=0; j<N; j ++)
+		for(int i=0; i<M; i ++){
+			vec acc = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};	
+			for(int k=0; k<steps; k ++)
+				acc += a[i*steps+k] * b[j*steps+k];
+			float sum = 0.0f;
+			for(int l=0;l<8;l++)
+				sum += acc[l];
+			C[M*j+i] = sum;
+		}
+
+}
+
+
+
 int main(int argc, char *argv[])
 {
 	size_t i;
@@ -126,7 +189,7 @@ int main(int argc, char *argv[])
 
 	init_timing(&timer);
 
-	matmul_v3(A,B,C,M,N,K); //your custom matmul implementation
+	matmul_v4(A,B,C,M,N,K); //your custom matmul implementation
 	
 	printf("Custom sgemm time: %f s\n", elapsed_time(timer));
 	
