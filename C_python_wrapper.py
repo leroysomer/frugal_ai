@@ -11,7 +11,7 @@ l_size = 512
 #              "-I/opt/homebrew/opt/openblas/include "
 #              "-L/opt/homebrew/opt/openblas/lib -lopenblas -lm"):
     
-if os.system("gcc matmul.c -o matmul -lm -lopenblas"): sys.exit("Compilation error")
+if os.system("gcc matmul.c -o matmul -lm -lopenblas -O3 -ffast-math"): sys.exit("Compilation error")
 
 c_code_output = os.popen("./matmul %d"%(l_size)).read()
 

@@ -142,7 +142,7 @@ void matmul_v4(const float *A, const float *B, float *C, int M, int N, int K)
 		}
 
 	for(int j=0; j<N;j++)
-		for (int k=0; k<K;k++){
+		for (int k=0; k<K;k++){	// #pragma omp parallel for schedule(static) shared(a, b, C, N, M, steps)
 			int idx = K*j+k;
 			b[idx/8][idx%8]=B[idx];
 		}
@@ -150,7 +150,7 @@ void matmul_v4(const float *A, const float *B, float *C, int M, int N, int K)
 	int steps = K/8;
 	
 	//3° Do the i,j,k loops with the vectorized accumulate loop over k and fill the corresponding cell of C
-	// #pragma omp parallel for schedule(static) shared(a, b, C, N, M, steps)
+	#pragma omp parallel for schedule(static,4) shared(a, b, C, N, M, steps)
 	for(int j=0; j<N; j ++)
 		for(int i=0; i<M; i ++){
 			vec acc = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};	
@@ -184,6 +184,7 @@ int main(int argc, char *argv[])
 
 	init_timing(&timer);
 
+	// matmul_v3(A,B,C,M,N,K);
 	matmul_blas(A,B,C_blas,M,N,K);
 
 	printf("Regular sgemm time: %f s\n", elapsed_time(timer));
