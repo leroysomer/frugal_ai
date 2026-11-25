@@ -72,14 +72,35 @@ void matmul_v4(const float *A, const float *B, float *C, int M, int N, int K)
 	
 	
 	//1° Create the vectorized versions of A and B
-	
+
+	vec *a = (vec*) aligned_alloc(sizeof(vec),(size_t)K*M*sizeof(float));
+	vec *b = (vec*) aligned_alloc(sizeof(vec),(size_t)K*N*sizeof(float));
+
 	//2° Fill the vectorized versions
+	for(int i=0; i<M;i++)
+		for (int k=0; k<K;k++){
+			int idx = i*K+k;
+			a[idx/8][idx%8]=A[idx];
+		}
+
+	for(int k=0; k<K;k++)
+		for (int j=0; j<N;j++){
+			int idx = K*j+k;
+			b[idx/8][idx%8]=B[idx];
+		}
+	
+	int steps = K/8;
 	
 	//3° Do the i,j,k loops with the vectorized accumulate loop over k and fill the corresponding cell of C
-	
+	for(int j=0; j<N; j ++)
+		for(int i=0; i<M; i ++){
+			vec acc = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};	
+			for(int k=0; k<steps; k ++)
+				acc += a[i*steps+k] * b[j*steps+k];
+			for(int l=0;l<8;l++)
+				C[M*j+i] += acc[l];
+		}
 }
-
-
 
 //Matmul using FMA operation on a sub-part of C and optimizing the cache usage
 //No need for transposition in this version as most of the work is done in cache anyway
