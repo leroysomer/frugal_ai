@@ -7,13 +7,12 @@ import numpy as np
 
 
 l_size = 512
-
-# if os.system("gcc matmul.c -o matmul -lm -lopenblas"): sys.exit("Compilation error")
-if os.system("gcc matmul.c -o matmul -O3 -ffast-math "
-             "-I/opt/homebrew/opt/openblas/include "
-             "-L/opt/homebrew/opt/openblas/lib -lopenblas -lm"):
+# if os.system("gcc matmul.c -o matmul -O3 -ffast-math "
+#              "-I/opt/homebrew/opt/openblas/include "
+#              "-L/opt/homebrew/opt/openblas/lib -lopenblas -lm"):
     
-    sys.exit("Compilation error")
+if os.system("gcc matmul.c -o matmul -lm -lopenblas"): sys.exit("Compilation error")
+
 c_code_output = os.popen("./matmul %d"%(l_size)).read()
 
 if "ERROR ! MATRIX DIFF !" in c_code_output:

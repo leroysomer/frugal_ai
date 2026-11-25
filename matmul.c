@@ -150,6 +150,7 @@ void matmul_v4(const float *A, const float *B, float *C, int M, int N, int K)
 	int steps = K/8;
 	
 	//3° Do the i,j,k loops with the vectorized accumulate loop over k and fill the corresponding cell of C
+	// #pragma omp parallel for schedule(static) shared(a, b, C, N, M, steps)
 	for(int j=0; j<N; j ++)
 		for(int i=0; i<M; i ++){
 			vec acc = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};	
@@ -159,7 +160,7 @@ void matmul_v4(const float *A, const float *B, float *C, int M, int N, int K)
 			for(int l=0;l<8;l++)
 				sum += acc[l];
 			C[M*j+i] = sum;
-		}
+	}
 
 }
 
