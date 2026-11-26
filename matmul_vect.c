@@ -80,7 +80,7 @@ void matmul_v4(const float *A, const float *B, float *C, int M, int N, int K)
 	for(int i=0; i<M;i++)
 		for (int k=0; k<K;k++){
 			int idx = i*K+k;
-			a[idx/8][idx%8]=A[idx];
+			a[idx/8][idx%8]=A[k*M+i];
 		}
 
 	for(int k=0; k<K;k++)

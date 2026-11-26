@@ -38,7 +38,7 @@ def curves(start, stop, step):
         times[1][i] = custom_time
 
     print(times[0])
-    flops = sizes**3/times
+    flops = (sizes**3/times)//1e9
 
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.plot(sizes, flops[0], label="openblas")

@@ -83,7 +83,7 @@ def curves(start, stop, step, funcs = funcs):
 			ellapsed_time = time.time() - t_start
 			times[i][j] = ellapsed_time
 	
-	flops = sizes**3/times
+	flops = (sizes**3/times)/1e9
 	
 	fig, ax = plt.subplots(figsize=(8, 5))
 	for i in range(4):
@@ -98,7 +98,7 @@ def curves(start, stop, step, funcs = funcs):
 	plt.show()
 	return
 
-curves(128, 1920, 128)
+curves(128, 1920+1, 128)
 
 
 # (frugal_ai) ndreesen@Nicholass-MacBook-Air frugal_ai % uv run python -m matmul
